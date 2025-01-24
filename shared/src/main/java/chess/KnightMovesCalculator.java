@@ -16,9 +16,8 @@ public class KnightMovesCalculator extends PieceMovesCalculator {
         }
 
         int[][] directions = {
-                {-1, -1}, {-1, 0}, {-1, 1},
-                {0, -1},           {0, 1},
-                {1, -1},  {1, 0},  {1, 1}
+                {-1, -2}, {-1, 2}, {1, 2}, {1, -2},
+                {-2, -1}, {-2, 1}, {2, 1}, {2, -1}
         };
 
         for (int[] direction : directions) {
