@@ -9,13 +9,12 @@ public class KnightMovesCalculator extends PieceMovesCalculator {
         Collection<ChessMove> moves = new ArrayList<>();
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
-        ChessPiece king = board.getPiece(position);
+        ChessPiece knight = board.getPiece(position);
 
-        if (king == null) {
-            return moves; // Return empty list if there's no piece at the position
+        if (knight == null) {
+            return moves;
         }
 
-        // Define all possible move directions for the king
         int[][] directions = {
                 {-1, -1}, {-1, 0}, {-1, 1},
                 {0, -1},           {0, 1},
@@ -30,7 +29,7 @@ public class KnightMovesCalculator extends PieceMovesCalculator {
                 ChessPosition newPosition = new ChessPosition(newRow, newCol);
                 ChessPiece pieceAtNewPosition = board.getPiece(newPosition);
 
-                if (pieceAtNewPosition == null || pieceAtNewPosition.getTeamColor() != king.getTeamColor()) {
+                if (pieceAtNewPosition == null || pieceAtNewPosition.getTeamColor() != knight.getTeamColor()) {
                     moves.add(new ChessMove(position, newPosition, null));
                 }
             }
