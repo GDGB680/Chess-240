@@ -7,8 +7,6 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
     @Override
     public Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new ArrayList<>();
-        int currentRow = position.getRow();
-        int currentCol = position.getColumn();
         ChessPiece pawn = board.getPiece(position);
 
         if (pawn == null) {
@@ -19,11 +17,11 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
         int startRow = (pawn.getTeamColor() == ChessGame.TeamColor.WHITE) ? 2 : 7;
 
         // Move forward one square
-        addPawnMove(board, position, direction, 0, moves, false);
-
-        // Move forward two squares if it's the pawn's first move
-        if (position.getRow() == startRow) {
-            addPawnMove(board, position, direction * 2, 0, moves, false);
+        if (addPawnMove(board, position, direction, 0, moves, false)) {
+            // Move forward two squares if it's the pawn's first move and the first square is empty
+            if (position.getRow() == startRow) {
+                addPawnMove(board, position, direction * 2, 0, moves, false);
+            }
         }
 
         // Capture diagonally
@@ -33,13 +31,13 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
         return moves;
     }
 
-    private void addPawnMove(ChessBoard board, ChessPosition start, int rowOffset, int colOffset,
-                             Collection<ChessMove> moves, boolean isCapture) {
+    private boolean addPawnMove(ChessBoard board, ChessPosition start, int rowOffset, int colOffset,
+                                Collection<ChessMove> moves, boolean isCapture) {
         int newRow = start.getRow() + rowOffset;
         int newCol = start.getColumn() + colOffset;
 
         if (!isValidPosition(newRow, newCol)) {
-            return;
+            return false;
         }
 
         ChessPosition end = new ChessPosition(newRow, newCol);
@@ -58,6 +56,8 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
             } else {
                 moves.add(new ChessMove(start, end, null));
             }
+            return true;
         }
+        return false;
     }
 }
