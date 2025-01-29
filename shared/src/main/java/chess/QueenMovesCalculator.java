@@ -21,7 +21,6 @@ public class QueenMovesCalculator extends PieceMovesCalculator {
                 {1, -1},  {1, 0},  {1, 1}
         };
 
-
         for (int[] direction : directions) {
             int newRow = currentRow;
             int newCol = currentCol;

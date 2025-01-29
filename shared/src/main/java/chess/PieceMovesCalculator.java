@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public abstract class PieceMovesCalculator {
+
     protected ChessGame.TeamColor teamColor;
 
     public abstract Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position);
@@ -43,8 +44,7 @@ public abstract class PieceMovesCalculator {
         return moves;
     }
 
-    private void addMovesInDirection(Collection<ChessMove> moves, ChessBoard board,
-                                     ChessPosition start, int rowDelta, int colDelta) {
+    private void addMovesInDirection(Collection<ChessMove> moves, ChessBoard board, ChessPosition start, int rowDelta, int colDelta) {
         int row = start.getRow();
         int col = start.getColumn();
         while (true) {

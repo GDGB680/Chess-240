@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Objects;
 
 public class ChessPiece {
+
     private PieceType pieceType;
     private ChessGame.TeamColor pieceColor;
     private PieceMovesCalculator movesCalculator;
