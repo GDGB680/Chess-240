@@ -91,13 +91,8 @@ public class ChessGame {
         throw new RuntimeException("Not implemented");
     }
 
-    /**
-     * Sets this game's chessboard with a given board
-     *
-     * @param board the new board to use
-     */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        new ChessBoard();
     }
 
     /**
@@ -106,6 +101,7 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        return new ChessBoard();
+        throw new RuntimeException("Not implemented");
+//        return this.ChessBoard();
     }
 }
