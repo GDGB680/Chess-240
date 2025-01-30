@@ -4,8 +4,8 @@ import java.util.Collection;
 
 public class ChessGame {
 
-//    private ChessGame.TeamColor player1;
-//    private ChessGame.TeamColor player2;
+    private TeamColor player1 = TeamColor.WHITE;
+    private TeamColor player2 = TeamColor.BLACK;
 //    private turn;
 
 

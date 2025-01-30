@@ -14,11 +14,9 @@ public class ChessPosition {
     public int getRow() {
         return this.row;
     }
-
     public int getColumn() {
         return this.col;
     }
-
 
     @Override
     public boolean equals(Object o) {
