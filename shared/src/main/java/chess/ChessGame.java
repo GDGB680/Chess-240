@@ -17,6 +17,7 @@ public class ChessGame {
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
+//        return ChessPiece.getTeamColor();
 
         throw new RuntimeException("Not implemented");
     }
@@ -31,9 +32,7 @@ public class ChessGame {
 //        ChessGame.TeamColor.WHITE
     }
 
-    /**
-     * Enum identifying the 2 possible teams in a chess game
-     */
+
     public enum TeamColor {
         WHITE,
         BLACK
@@ -47,6 +46,7 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+
         throw new RuntimeException("Not implemented");
     }
 

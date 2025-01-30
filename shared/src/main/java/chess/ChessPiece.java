@@ -27,7 +27,6 @@ public class ChessPiece {
     public ChessGame.TeamColor getTeamColor() {
         return this.pieceColor;
     }
-
     public PieceType getPieceType() {
         return this.pieceType;
     }

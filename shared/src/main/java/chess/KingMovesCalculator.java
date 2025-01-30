@@ -12,10 +12,9 @@ public class KingMovesCalculator extends PieceMovesCalculator {
         ChessPiece king = board.getPiece(position);
 
         if (king == null) {
-            return moves; // Return empty list if there's no piece at the position
+            return moves;
         }
 
-        // Define all possible move directions for the king
         int[][] directions = {
                 {-1, -1}, {-1, 0}, {-1, 1},
                 {0, -1},           {0, 1},
