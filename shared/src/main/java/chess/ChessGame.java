@@ -7,7 +7,7 @@ public class ChessGame {
     private TeamColor player1 = TeamColor.WHITE;
     private TeamColor player2 = TeamColor.BLACK;
 //    private turn;
-
+//isdk
 
     public ChessGame() {
 
