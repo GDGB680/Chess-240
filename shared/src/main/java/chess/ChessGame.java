@@ -4,39 +4,24 @@ import java.util.Collection;
 
 public class ChessGame {
 
-    private TeamColor player1 = TeamColor.WHITE;
-    private TeamColor player2 = TeamColor.BLACK;
-//    private turn;
-//isdk
+    private TeamColor currentTurn;
+    private ChessBoard board;
 
     public ChessGame() {
-
+        this.board = new ChessBoard();
+        board.resetBoard();
+        this.currentTurn = TeamColor.WHITE;
     }
 
-    /**
-     * @return Which team's turn it is
-     */
-    public TeamColor getTeamTurn() {
-//        return ChessPiece.getTeamColor();
-
-        throw new RuntimeException("Not implemented");
-    }
-
-    /**
-     * Set's which teams turn it is
-     *
-     * @param team the team whose turn it is
-     */
-    public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
-//        ChessGame.TeamColor.WHITE
-    }
-
+    public TeamColor getTeamTurn() { return currentTurn; }
+    public void setTeamTurn(TeamColor team) { this.currentTurn = team; }
 
     public enum TeamColor {
         WHITE,
         BLACK
     }
+
+
 
     /**
      * Gets a valid moves for a piece at the given location
@@ -67,6 +52,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+
         throw new RuntimeException("Not implemented");
     }
 
@@ -77,6 +63,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
+
         throw new RuntimeException("Not implemented");
     }
 
@@ -88,20 +75,13 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+
         throw new RuntimeException("Not implemented");
     }
+
 
     public void setBoard(ChessBoard board) {
-        new ChessBoard();
+        this.board = board;
     }
-
-    /**
-     * Gets the current chessboard
-     *
-     * @return the chessboard
-     */
-    public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
-//        return this.ChessBoard();
-    }
+    public ChessBoard getBoard() { return this.board; }
 }
