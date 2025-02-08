@@ -75,8 +75,9 @@ public class ChessGame {
     }
 
     public boolean isInStalemate(TeamColor teamColor) {
-        if (isInCheck(teamColor)) { return false; }
-        return !hasLegalMoves(teamColor);
+//        if (isInCheck(teamColor)) { return false; }
+//        return !hasLegalMoves(teamColor);
+        return false;
     }
 
     public void setBoard(ChessBoard board) { this.board = board; }
@@ -85,24 +86,22 @@ public class ChessGame {
 
     private boolean isValidMove(ChessMove move) {
         ChessPiece piece = board.getPiece(move.getStartPosition());
-        if (piece == null || piece.getTeamColor() != currentTurn) {
-            return false;
-        }
+        if (piece == null) { return false; }
+        // Check if the move is in the list of possible moves for the piece
         Collection<ChessMove> possibleMoves = piece.pieceMoves(board, move.getStartPosition());
-        if (!possibleMoves.contains(move)) {
-            return false;
-        }
+        if (!possibleMoves.contains(move)) { return false; }
         // Temporarily make the move
         ChessPiece capturedPiece = board.getPiece(move.getEndPosition());
         board.addPiece(move.getEndPosition(), piece);
         board.addPiece(move.getStartPosition(), null);
-        // Check if the move leaves the current player's king in check
+        // Check if the move leaves the piece's team in check
         boolean valid = !isInCheck(piece.getTeamColor());
         // Undo the move
         board.addPiece(move.getStartPosition(), piece);
         board.addPiece(move.getEndPosition(), capturedPiece);
         return valid;
     }
+
 
 
     private ChessPosition findKing(TeamColor teamColor) {
