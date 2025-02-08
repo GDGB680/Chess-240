@@ -24,8 +24,8 @@ public class ChessGame {
 
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
-        if (piece == null) {
-            return null;
+        if (piece == null || piece.getTeamColor() != currentTurn) {
+            return new ArrayList<>();
         }
         Collection<ChessMove> possibleMoves = piece.pieceMoves(board, startPosition);
         Collection<ChessMove> validMoves = new ArrayList<>();
@@ -72,13 +72,20 @@ public class ChessGame {
 
     private boolean isValidMove(ChessMove move) {
         ChessPiece piece = board.getPiece(move.getStartPosition());
-        if (piece == null || piece.getTeamColor() != currentTurn) { return false; }
+        if (piece == null || piece.getTeamColor() != currentTurn) {
+            return false;
+        }
         Collection<ChessMove> possibleMoves = piece.pieceMoves(board, move.getStartPosition());
-        if (!possibleMoves.contains(move)) { return false; }
+        if (!possibleMoves.contains(move)) {
+            return false;
+        }
+        // Temporarily make the move
         ChessPiece capturedPiece = board.getPiece(move.getEndPosition());
         board.addPiece(move.getEndPosition(), piece);
         board.addPiece(move.getStartPosition(), null);
+        // Check if the move leaves the current player in check
         boolean valid = !isInCheck(currentTurn);
+        // Undo the move
         board.addPiece(move.getStartPosition(), piece);
         board.addPiece(move.getEndPosition(), capturedPiece);
         return valid;
