@@ -99,16 +99,11 @@ public class ChessGame {
     }
 
     private boolean isPositionUnderAttack(ChessPosition position, TeamColor teamColor) {
-        TeamColor attackingTeam;
-        if (teamColor == TeamColor.WHITE) {
-            attackingTeam = TeamColor.BLACK;
-        } else {
-            attackingTeam = TeamColor.WHITE;
-        }
+        TeamColor attackingTeam = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition startPosition = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(position);
+                ChessPiece piece = board.getPiece(startPosition);
                 if (piece != null && piece.getTeamColor() == attackingTeam) {
                     Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
                     for (ChessMove move : moves) {
