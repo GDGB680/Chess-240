@@ -38,14 +38,29 @@ public class ChessGame {
     }
 
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        ChessPiece movingPiece = board.getPiece(move.getStartPosition());
+        if (movingPiece == null || movingPiece.getTeamColor() != currentTurn) {
+            throw new InvalidMoveException("No piece at start position or wrong color");
+        }
         if (!isValidMove(move)) {
             throw new InvalidMoveException("Invalid move");
         }
-        board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
+        // Perform the move
+        ChessPiece capturedPiece = board.getPiece(move.getEndPosition());
+        board.addPiece(move.getEndPosition(), movingPiece);
         board.addPiece(move.getStartPosition(), null);
+        // Handle pawn promotion
         if (move.getPromotionPiece() != null) {
             board.addPiece(move.getEndPosition(), new ChessPiece(currentTurn, move.getPromotionPiece()));
         }
+        // Check if the move leaves the current player in check
+        if (isInCheck(currentTurn)) {
+            // Undo the move
+            board.addPiece(move.getStartPosition(), movingPiece);
+            board.addPiece(move.getEndPosition(), capturedPiece);
+            throw new InvalidMoveException("Move leaves king in check");
+        }
+        // Switch turns
         currentTurn = (currentTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
@@ -68,8 +83,6 @@ public class ChessGame {
     public ChessBoard getBoard() { return this.board; }
 
 
-
-
     private boolean isValidMove(ChessMove move) {
         ChessPiece piece = board.getPiece(move.getStartPosition());
         if (piece == null || piece.getTeamColor() != currentTurn) {
@@ -83,8 +96,8 @@ public class ChessGame {
         ChessPiece capturedPiece = board.getPiece(move.getEndPosition());
         board.addPiece(move.getEndPosition(), piece);
         board.addPiece(move.getStartPosition(), null);
-        // Check if the move leaves the current player in check
-        boolean valid = !isInCheck(currentTurn);
+        // Check if the move leaves the current player's king in check
+        boolean valid = !isInCheck(piece.getTeamColor());
         // Undo the move
         board.addPiece(move.getStartPosition(), piece);
         board.addPiece(move.getEndPosition(), capturedPiece);
@@ -130,9 +143,11 @@ public class ChessGame {
                 ChessPosition position = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(position);
                 if (piece != null && piece.getTeamColor() == teamColor) {
-                    Collection<ChessMove> moves = validMoves(position);
-                    if (moves != null && !moves.isEmpty()) {
-                        return true;
+                    Collection<ChessMove> moves = piece.pieceMoves(board, position);
+                    for (ChessMove move : moves) {
+                        if (isValidMove(move)) {
+                            return true;
+                        }
                     }
                 }
             }
