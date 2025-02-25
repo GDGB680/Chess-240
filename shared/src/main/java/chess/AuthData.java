@@ -3,7 +3,6 @@ package chess;
 import java.util.Objects;
 
 public class AuthData {
-
     private final String authToken;
     private final String username;
 

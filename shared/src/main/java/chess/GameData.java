@@ -3,7 +3,6 @@ package chess;
 import java.util.Objects;
 
 class GameData {
-
     private final int gameID;
     private final String whiteUsername;
     private final String blackUsername;
