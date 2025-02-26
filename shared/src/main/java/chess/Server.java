@@ -12,7 +12,7 @@ public class Server {
 //        // Register your endpoints and handle exceptions here.
 //        Spark.get("/hello", (req, res)->"Hello, world");
 //
-//        Spark.get("/hello/:name", (req,res)->{
+//        Spark.get("/hello/:name", (req, res)->{
 //            return "Hello, "+ req.params(":name");
 //        });
 
