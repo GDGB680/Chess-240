@@ -1,4 +1,5 @@
 package service;
+import chess.*;
 
 public class UserService {
 //    public RegisterResult register(RegisterRequest registerRequest) {}
