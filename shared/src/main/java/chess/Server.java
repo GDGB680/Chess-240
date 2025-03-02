@@ -77,9 +77,9 @@ public class Server {
         // Implement your database clearing logic here.
         // This is a placeholder.  Replace with your actual database clearing code.
         // For example, if you are using a HashMap to store data:
-        // users.clear();
-        // games.clear();
-        // authTokens.clear();
+//         users.clear();
+//         games.clear();
+//         authTokens.clear();
         System.out.println("Database cleared"); // Replace this!  This is just a marker.
     }
 }

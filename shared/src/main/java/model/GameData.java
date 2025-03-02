@@ -1,5 +1,6 @@
-package chess;
+package model;
 
+import chess.ChessGame;
 import java.util.Objects;
 
 class GameData {
