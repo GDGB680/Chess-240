@@ -3,15 +3,15 @@ package model;
 import chess.ChessGame;
 import java.util.Objects;
 
-class GameData {
-    private final int gameID;
-    private final String whiteUsername;
-    private final String blackUsername;
-    private final String gameName;
-    private final ChessGame game;
+public class GameData {
+    public final int gameID;
+    public final String whiteUsername;
+    public final String blackUsername;
+    public final String gameName;
+    public final ChessGame game;
 
-    GameData(int gameID, String whiteUsername, String blackUsername,
-            String gameName, ChessGame game) {
+    public GameData(int gameID, String whiteUsername, String blackUsername,
+                    String gameName, ChessGame game) {
         this.gameID = gameID;
         this.whiteUsername = whiteUsername;
         this.blackUsername = blackUsername;

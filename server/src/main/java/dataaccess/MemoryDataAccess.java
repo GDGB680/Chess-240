@@ -1,29 +1,52 @@
 package dataaccess;
 
+import chess.ChessGame;
+import model.*;
+
 import java.util.Collection;
 import java.util.HashMap;
 
 public class MemoryDataAccess implements DataAccess {
 
-    final private HashMap<userName ,User> users = new HashMap<>();
-    final private HashMap<authToken ,AuthToken> authTokens = new HashMap<>();
-    final private HashMap<gameID ,Game> games = new HashMap<>();
+    final private HashMap<String ,UserData> users = new HashMap<>();
+    final private HashMap<String ,AuthData> authTokens = new HashMap<>();
+    final private HashMap<Integer,GameData> games = new HashMap<>();
 
-    public User createUser(User user) {
-        user = new User();
-
+    public UserData createUser(UserData user) {
+        user = new UserData(user.username , user.password, user.email);
+        users.put(user.username, user);
         return user;
     }
-    public AuthToken createAuthToken(AuthToken authToken) {
-        authToken = new AuthToken();
-
+    public AuthData createAuthToken(AuthData authToken) {
+        authToken = new AuthData(authToken.authToken, authToken.username);
+        authTokens.put(authToken.username, authToken);
         return authToken;
     }
+    public GameData createGame(GameData game) {
+        game = new GameData(game.gameID, game.whiteUsername, game.blackUsername, game.gameName, game.game);
+        games.put(game.gameID, game);
+        return game;
+    }
 
-    public Collection<Game> listGames() { return games.values(); }
+    public Collection<GameData> listGames() { return games.values(); }
 
-    public User getUser(String userName) { return users.get(userName); }
-    public AuthToken getAuthToken(String authToken) { return authTokens.get(authToken); }
+    public UserData getUser(String username) { return users.get(username); }
+    public AuthData getAuthToken(String username) { return authTokens.get(username); }
+    public GameData getGame(int gameID) { return games.get(gameID); }
 
-    public void deleteAuthToken(String authToken) { authTokens.remove(authToken); }
+    public void updateGame(GameData game) {
+        if (games.containsKey(game.gameID)) {
+            games.put(game.gameID, game);
+        } else {
+            throw new RuntimeException("Game not found");
+        }
+    }
+
+    public void deleteAuthToken(String username) { authTokens.remove(username); }
+
+    public void clear() {
+        users.clear();
+        authTokens.clear();
+        games.clear();
+    }
 }

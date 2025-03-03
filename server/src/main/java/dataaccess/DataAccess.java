@@ -1,18 +1,20 @@
 package dataaccess;
+import model.*;
 
+import java.util.Collection;
 
 public interface DataAccess {
 
-    User createUser(User user) throws DataAccessException;
-    User getUser(String userName) throws DataAccessException;
+    UserData createUser(UserData user) throws DataAccessException;
+    UserData getUser(String userName) throws DataAccessException;
 
-    Game createGame(Game game) throws DataAccessException;
-    Game getGame(int gameID) throws DataAccessException;
-    Collection<Game> listGames() throws DataAccessException;
-    updateGame
+    GameData createGame(GameData game) throws DataAccessException;
+    GameData getGame(int gameID) throws DataAccessException;
+    Collection<GameData> listGames() throws DataAccessException;
+    void updateGame(GameData game) throws DataAccessException;
 
-    AuthToken createAuthToken(AuthToken authToken) throws DataAccessException;
-    AuthToken getAuthToken(String authToken) throws DataAccessException;
+    AuthData createAuthToken(AuthData authToken) throws DataAccessException;
+    AuthData getAuthToken(String authToken) throws DataAccessException;
     void deleteAuthToken(String authToken) throws DataAccessException;
 
     void clear() throws DataAccessException;

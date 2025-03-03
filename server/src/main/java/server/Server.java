@@ -1,12 +1,15 @@
 package server;
 import spark.Spark;
-
+import dataaccess.*;
+import model.*;
 import com.google.gson.Gson;
 import java.util.HashMap;
 import java.util.Map;
 
 
 public class Server {
+    private final MemoryDataAccess dataAccess = new MemoryDataAccess();
+
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
@@ -24,7 +27,7 @@ public class Server {
         //Clear application
         Spark.delete("/db", (req, res) -> {
             try {
-                clearDatabase();
+                dataAccess.clear();
                 res.status(200);
                 return gson.toJson(new HashMap<>());
             } catch (Exception e) {
@@ -35,33 +38,34 @@ public class Server {
             }
         });
 
-        //Register
-        Spark.post("/user", (req, res)->{
+        // Register
+        Spark.post("/user", (req, res) -> {
             try {
-                UserRequest userRequest = gson.fromJson(req.body(), UserRequest.class);
+                UserData userRequest = gson.fromJson(req.body(), UserData.class);
                 if (userRequest.username == null || userRequest.password == null || userRequest.email == null) {
                     res.status(400);
                     return gson.toJson(Map.of("message", "Error: bad request"));
                 }
-                // Check if the username is already taken
-                if (users.containsKey(userRequest.username)) {
+
+                // if already taken
+                if (dataAccess.getUser(userRequest.username) != null) {
                     res.status(403);
                     return gson.toJson(Map.of("message", "Error: already taken"));
                 }
-                // Create new user and auth token
-                User newUser = new User(userRequest.username, userRequest.password, userRequest.email);
-                users.put(userRequest.username, newUser);
+
+                // new user and auth token
+                UserData newUser = dataAccess.createUser(userRequest);
                 String authToken = generateAuthToken();
-                authTokens.put(authToken, userRequest.username);
-                // Prepare and send the response
+                AuthData newAuthData = dataAccess.createAuthToken(new AuthData(authToken, newUser.username));
+
+                // response
                 res.status(200);
-                return gson.toJson(Map.of("username", userRequest.username, "authToken", authToken));
+                return gson.toJson(Map.of("username", newUser.username, "authToken", newAuthData.authToken));
             } catch (Exception e) {
                 res.status(500);
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
-
 
         //Login
         Spark.post("/session", (req, res)->{
@@ -96,13 +100,13 @@ public class Server {
     }
 
 
-    private void clearDatabase() {
-        // Implement your database clearing logic here.
-        // This is a placeholder.  Replace with your actual database clearing code.
-        // For example, if you are using a HashMap to store data:
-//         users.clear();
-//         games.clear();
-//         authTokens.clear();
-        System.out.println("Database cleared"); // Replace this!  This is just a marker.
+    private String generateAuthToken() {
+        return java.util.UUID.randomUUID().toString();
     }
+
+    private void clearDatabase() {
+        dataAccess.clear();
+    }
+
+
 }
