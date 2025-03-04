@@ -4,6 +4,8 @@ import chess.*;
 import dataaccess.*;
 import model.*;
 
+import java.util.UUID;
+
 public class UserService {
 
     private final DataAccess dataAccess;
@@ -75,7 +77,7 @@ public class UserService {
         dataAccess.deleteAuthToken(request.authToken());
     }
 
-    private String generateToken() {
-        return java.util.UUID.randomUUID().toString();
+    private static String generateToken() {
+        return UUID.randomUUID().toString();
     }
 }
