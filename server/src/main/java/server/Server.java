@@ -23,8 +23,10 @@ public class Server {
         Spark.delete("/db", (req, res) -> {
             try {
                 dataAccess.clear();
+
                 res.status(200);
                 return gson.toJson(new HashMap<>());
+
             } catch (Exception e) {
                 res.status(500);
                 Map<String, String> errorResponse = new HashMap<>();
@@ -37,8 +39,10 @@ public class Server {
             try {
                 RegisterRequest registerRequest = gson.fromJson(req.body(), RegisterRequest.class);
                 RegisterResult result = userService.register(registerRequest);
+
                 res.status(200);
                 return gson.toJson(result);
+
             } catch (DataAccessException e) {
                 if (e.getMessage().equals("bad request")) {
                     res.status(400);
