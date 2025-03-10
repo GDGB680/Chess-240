@@ -41,6 +41,7 @@ public class UserService {
         return new LoginResult(request.username(), authToken);
     }
 
+
     public void logout(LogoutRequest request) throws DataAccessException {
         if (request.authToken() == null) {
             throw new DataAccessException("bad request");
@@ -51,6 +52,7 @@ public class UserService {
         }
         dataAccess.deleteAuthToken(request.authToken());
     }
+
 
     private static String generateToken() {
         return UUID.randomUUID().toString();

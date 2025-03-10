@@ -17,6 +17,7 @@ public class Server {
         Spark.staticFiles.location("web");
         Gson gson = new Gson();
 
+        
         //Clear application
         Spark.delete("/db", (req, res) -> {
             try {
@@ -64,7 +65,7 @@ public class Server {
                 res.status(200);
                 return gson.toJson(loginResult);
             } catch (Exception e) {
-                res.status(500);
+                res.status(determineStatusCode(e.getMessage()));
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
