@@ -63,12 +63,18 @@ public class GameService {
         GameData updatedGameData;
         if (request.playerColor() != null) {
             if (request.playerColor().equals("WHITE")) {
-                updatedGameData = new GameData(gameData.getGameID(), username, gameData.getBlackUsername(), gameData.getGameName(), gameData.getGame());
+                updatedGameData = new GameData(gameData.getGameID(), username,
+                        gameData.getBlackUsername(), gameData.getGameName(),
+                        gameData.getGame());
             } else {
-                updatedGameData = new GameData(gameData.getGameID(), gameData.getWhiteUsername(), username, gameData.getGameName(), gameData.getGame());
+                updatedGameData = new GameData(gameData.getGameID(),
+                        gameData.getWhiteUsername(), username, gameData.getGameName(),
+                        gameData.getGame());
             }
         } else {
-            updatedGameData = new GameData(gameData.getGameID(), gameData.getWhiteUsername(), gameData.getBlackUsername(), gameData.getGameName(), gameData.getGame());
+            updatedGameData = new GameData(gameData.getGameID(),
+                    gameData.getWhiteUsername(), gameData.getBlackUsername(),
+                    gameData.getGameName(), gameData.getGame());
         }
         dataAccess.updateGame(updatedGameData);
     }

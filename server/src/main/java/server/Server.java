@@ -16,7 +16,7 @@ public class Server {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
         Gson gson = new Gson();
-        
+
         //Clear application
         Spark.delete("/db", (req, res) -> {
             try {
@@ -40,7 +40,9 @@ public class Server {
                     return gson.toJson(Map.of("message", "Error: empty request body"));
                 }
                 RegisterRequest registerRequest = gson.fromJson(body, RegisterRequest.class);
-                if (registerRequest == null || registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null) {
+                if (registerRequest == null || registerRequest.username()
+                        == null || registerRequest.password() == null ||
+                        registerRequest.email() == null) {
                     res.status(400);
                     return gson.toJson(Map.of("message", "Error: missing required fields"));
                 }

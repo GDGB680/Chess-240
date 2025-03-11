@@ -4,9 +4,7 @@ public class ChessBoard {
 
     private ChessPiece[][] board;
 
-    public ChessBoard() {
-        this.board = new ChessPiece[8][8];
-    }
+    public ChessBoard() { this.board = new ChessPiece[8][8]; }
 
     public void addPiece(ChessPosition position, ChessPiece piece) {
         this.board[position.getRow() - 1][position.getColumn() - 1] = piece;
@@ -60,7 +58,5 @@ public class ChessBoard {
     }
 
     @Override
-    public int hashCode() {
-        return Arrays.deepHashCode(board);
-    }
+    public int hashCode() { return Arrays.deepHashCode(board); }
 }

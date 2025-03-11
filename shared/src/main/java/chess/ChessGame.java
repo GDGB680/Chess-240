@@ -122,15 +122,9 @@ public class ChessGame {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition startPosition = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(startPosition);
-                if (piece != null && piece.getTeamColor() == attackingTeam) {
-                    Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
-                    for (ChessMove move : moves) {
-                        if (move.getEndPosition().equals(position)) {
-                            return true;
-                        }
-                    }
-                }
+//                ChessPiece piece = board.getPiece(startPosition);
+                evilTeam(board.getPiece(startPosition), new ChessPosition(row, col),(teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE, position);
+
             }
         }
         return false;
@@ -140,17 +134,39 @@ public class ChessGame {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition position = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(position);
-                if (piece != null && piece.getTeamColor() == teamColor) {
-                    Collection<ChessMove> moves = piece.pieceMoves(board, position);
-                    for (ChessMove move : moves) {
-                        if (isValidMove(move)) {
-                            return true;
-                        }
-                    }
+//                ChessPiece piece = board.getPiece(position);
+                goodTeam(board.getPiece(position), teamColor, position);
+            }
+        }
+        return false;
+    }
+
+    private boolean goodTeam(ChessPiece piece, TeamColor teamColor, ChessPosition position) {
+        if (piece != null && piece.getTeamColor() == teamColor) {
+            Collection<ChessMove> moves = piece.pieceMoves(board, position);
+            for (ChessMove move : moves) {
+                if (isValidMove(move)) {
+                    return true;
                 }
             }
         }
         return false;
     }
+
+    private boolean evilTeam(ChessPiece piece, ChessPosition startPosition,
+                             TeamColor attackingTeam, ChessPosition position) {
+        if (piece != null && piece.getTeamColor() == attackingTeam) {
+            Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+            for (ChessMove move : moves) {
+                if (move.getEndPosition().equals(position)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+
+
 }

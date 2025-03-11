@@ -24,12 +24,8 @@ public class ChessPiece {
         PAWN
     }
 
-    public ChessGame.TeamColor getTeamColor() {
-        return this.pieceColor;
-    }
-    public PieceType getPieceType() {
-        return this.pieceType;
-    }
+    public ChessGame.TeamColor getTeamColor() { return this.pieceColor; }
+    public PieceType getPieceType() { return this.pieceType; }
 
     private PieceMovesCalculator createMovesCalculator(PieceType type) {
         switch (type) {
@@ -56,7 +52,5 @@ public class ChessPiece {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(pieceColor, pieceType);
-    }
+    public int hashCode() { return Objects.hash(pieceColor, pieceType); }
 }

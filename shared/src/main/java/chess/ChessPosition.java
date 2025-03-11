@@ -11,12 +11,8 @@ public class ChessPosition {
         this.col = col;
     }
 
-    public int getRow() {
-        return this.row;
-    }
-    public int getColumn() {
-        return this.col;
-    }
+    public int getRow() { return this.row; }
+    public int getColumn() { return this.col; }
 
     @Override
     public boolean equals(Object o) {
@@ -27,8 +23,6 @@ public class ChessPosition {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(row, col);
-    }
+    public int hashCode() { return Objects.hash(row, col); }
 }
 
