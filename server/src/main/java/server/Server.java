@@ -16,6 +16,7 @@ public class Server {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
         Gson gson = new Gson();
+
         
         //Clear application
         Spark.delete("/db", (req, res) -> {
