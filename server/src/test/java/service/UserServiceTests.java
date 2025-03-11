@@ -12,8 +12,6 @@ import java.util.Locale;
 
 
 public class UserServiceTests {
-
-
-
+    
 }
 
