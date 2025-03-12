@@ -79,7 +79,7 @@ public class GameService {
         dataAccess.updateGame(updatedGameData);
     }
 
-    
+
     private int generateGameID() {
         Random random = new Random();
         return random.nextInt(1000);
