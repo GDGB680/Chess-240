@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class ChessGame {
 
@@ -117,16 +118,49 @@ public class ChessGame {
         return null;
     }
 
-    private boolean isPositionUnderAttack(ChessPosition position, TeamColor teamColor) {
-        TeamColor attackingTeam = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
-        for (int row = 1; row <= 8; row++) {
-            for (int col = 1; col <= 8; col++) {
-                ChessPosition startPosition = new ChessPosition(row, col);
-//                ChessPiece piece = board.getPiece(startPosition);
-                evilTeam(board.getPiece(startPosition), new ChessPosition(row, col),(teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE, position);
+    private boolean isPositionUnderAttack(ChessPosition targetPosition, TeamColor defendingTeam) {
+        TeamColor attackingTeam = (defendingTeam == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
 
+        // Get all positions with pieces of the attacking team
+        List<ChessPosition> attackingPiecePositions = findPiecesOfTeam(attackingTeam);
+
+        // Check if any attacking piece can attack the target position
+        for (ChessPosition piecePosition : attackingPiecePositions) {
+            if (canPieceAttackTarget(piecePosition, targetPosition)) {
+                return true;
             }
         }
+
+        return false;
+    }
+
+    private List<ChessPosition> findPiecesOfTeam(TeamColor team) {
+        List<ChessPosition> positions = new ArrayList<>();
+
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(position);
+
+                if (piece != null && piece.getTeamColor() == team) {
+                    positions.add(position);
+                }
+            }
+        }
+
+        return positions;
+    }
+
+    private boolean canPieceAttackTarget(ChessPosition piecePosition, ChessPosition targetPosition) {
+        ChessPiece piece = board.getPiece(piecePosition);
+        Collection<ChessMove> moves = piece.pieceMoves(board, piecePosition);
+
+        for (ChessMove move : moves) {
+            if (move.getEndPosition().equals(targetPosition)) {
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -134,24 +168,30 @@ public class ChessGame {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition position = new ChessPosition(row, col);
-//                ChessPiece piece = board.getPiece(position);
-                goodTeam(board.getPiece(position), teamColor, position);
-            }
-        }
-        return false;
-    }
-
-    private boolean goodTeam(ChessPiece piece, TeamColor teamColor, ChessPosition position) {
-        if (piece != null && piece.getTeamColor() == teamColor) {
-            Collection<ChessMove> moves = piece.pieceMoves(board, position);
-            for (ChessMove move : moves) {
-                if (isValidMove(move)) {
-                    return true;
+                ChessPiece piece = board.getPiece(position);
+                if (piece != null && piece.getTeamColor() == teamColor) {
+                    Collection<ChessMove> moves = validMoves(position);
+                    if (!moves.isEmpty()) {
+                        return true;
+                    }
                 }
             }
         }
         return false;
     }
+
+
+//    private boolean goodTeam(ChessPiece piece, TeamColor teamColor, ChessPosition position) {
+//        if (piece != null && piece.getTeamColor() == teamColor) {
+//            Collection<ChessMove> moves = piece.pieceMoves(board, position);
+//            for (ChessMove move : moves) {
+//                if (isValidMove(move)) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
 
     private boolean evilTeam(ChessPiece piece, ChessPosition startPosition,
                              TeamColor attackingTeam, ChessPosition position) {
