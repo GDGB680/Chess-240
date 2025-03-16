@@ -38,43 +38,37 @@ public class GameService {
     }
 
     public void joinGame(JoinGameRequest request, String authToken) throws DataAccessException {
-        if (request == null || request.gameID() == null) {
-            throw new DataAccessException("bad request");
-        }
+        // Validate auth token
         AuthData authData = dataAccess.getAuthToken(authToken);
-        if (authData == null) {
-            throw new DataAccessException("unauthorized");
-        }
+        if (authData == null) { throw new DataAccessException("unauthorized"); }
+        // Validate game ID
+        if (request.gameID() == null) { throw new DataAccessException("bad request"); }
         GameData gameData = dataAccess.getGame(request.gameID());
-        if (gameData == null) {
+        if (gameData == null) { throw new DataAccessException("bad request"); }
+        // Validate player color
+        String playerColor = request.playerColor();
+        // Invalid color
+        if (playerColor == null || playerColor.isEmpty() ||
+                (!playerColor.equals("WHITE") && !playerColor.equals("BLACK"))) {
             throw new DataAccessException("bad request");
         }
-        if (request.playerColor() != null && !request.playerColor().equals("WHITE") && !request.playerColor().equals("BLACK")) {
-            throw new DataAccessException("bad request");
+        // Check if spot is taken
+        if (playerColor.equals("WHITE") && gameData.whiteUsername != null) {
+            throw new DataAccessException("already taken");
+        } else if (playerColor.equals("BLACK") && gameData.blackUsername != null) {
+            throw new DataAccessException("already taken");
         }
-        if (request.playerColor() != null) {
-            if (request.playerColor().equals("WHITE") && gameData.getWhiteUsername() != null) {
-                throw new DataAccessException("already taken");
-            } else if (request.playerColor().equals("BLACK") && gameData.getBlackUsername() != null) {
-                throw new DataAccessException("already taken");
-            }
-        }
+
         String username = authData.getUsername();
         GameData updatedGameData;
-        if (request.playerColor() != null) {
-            if (request.playerColor().equals("WHITE")) {
-                updatedGameData = new GameData(gameData.getGameID(), username,
-                        gameData.getBlackUsername(), gameData.getGameName(),
-                        gameData.getGame());
-            } else {
-                updatedGameData = new GameData(gameData.getGameID(),
-                        gameData.getWhiteUsername(), username, gameData.getGameName(),
-                        gameData.getGame());
-            }
+        if (request.playerColor().equals("WHITE")) {
+            updatedGameData = new GameData(gameData.getGameID(), username,
+                    gameData.getBlackUsername(), gameData.getGameName(),
+                    gameData.getGame());
         } else {
             updatedGameData = new GameData(gameData.getGameID(),
-                    gameData.getWhiteUsername(), gameData.getBlackUsername(),
-                    gameData.getGameName(), gameData.getGame());
+                    gameData.getWhiteUsername(), username, gameData.getGameName(),
+                    gameData.getGame());
         }
         dataAccess.updateGame(updatedGameData);
     }

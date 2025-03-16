@@ -11,13 +11,8 @@ public class AuthData {
         this.username = username;
     }
 
-    public String getAuthToken() {
-        return authToken;
-    }
-
-    public String getUsername() {
-        return username;
-    }
+    public String getAuthToken() { return authToken; }
+    public String getUsername() { return username; }
 
     @Override
     public boolean equals(Object o) {

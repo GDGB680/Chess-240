@@ -19,7 +19,7 @@ public class MemoryDataAccess implements DataAccess {
     }
     public AuthData createAuthToken(AuthData authToken) {
         authToken = new AuthData(authToken.authToken, authToken.username);
-        authTokens.put(authToken.username, authToken);
+        authTokens.put(authToken.authToken, authToken);  // STORE BY TOKEN
         return authToken;
     }
     public GameData createGame(GameData game) {
@@ -31,18 +31,16 @@ public class MemoryDataAccess implements DataAccess {
     public Collection<GameData> listGames() { return games.values(); }
 
     public UserData getUser(String username) { return users.get(username); }
-    public AuthData getAuthToken(String username) { return authTokens.get(username); }
+    public AuthData getAuthToken(String token) { return authTokens.get(token); }
     public GameData getGame(int gameID) { return games.get(gameID); }
 
     public void updateGame(GameData game) {
         if (games.containsKey(game.gameID)) {
             games.put(game.gameID, game);
-        } else {
-            throw new RuntimeException("Game not found");
-        }
+        } else { throw new RuntimeException("Game not found"); }
     }
 
-    public void deleteAuthToken(String username) { authTokens.remove(username); }
+    public void deleteAuthToken(String token) { authTokens.remove(token); }
 
     public void clear() {
         users.clear();
