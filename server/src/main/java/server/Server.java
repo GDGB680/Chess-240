@@ -80,10 +80,11 @@ public class Server {
                 res.status(200);
                 return gson.toJson(new HashMap<>());
             } catch (DataAccessException e) {
-                res.status(determineStatusCode(e.getMessage()));
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
-            }  catch (Exception e) {
-                res.status(500);
+                if (e.getMessage().equals("unauthorized")) {
+                    res.status(401);
+                } else {
+                    res.status(500);
+                }
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
