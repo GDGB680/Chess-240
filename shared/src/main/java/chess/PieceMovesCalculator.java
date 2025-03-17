@@ -8,12 +8,18 @@ public abstract class PieceMovesCalculator {
     protected ChessGame.TeamColor teamColor;
     public abstract Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position);
     protected boolean isValidPosition(int row, int col) {
-        return row >= 1 && row <= 8 && col >= 1 && col <= 8;
+        if (row >= 1 && row <= 8 && col >= 1 && col <= 8) {
+            return true;
+        }
+        return false;
     }
 
     protected boolean isEmptyOrCapturablePosition(ChessBoard board, ChessPosition newPosition) {
         ChessPiece pieceAtNewPosition = board.getPiece(newPosition);
-        return pieceAtNewPosition == null || pieceAtNewPosition.getTeamColor() != teamColor;
+        if (pieceAtNewPosition == null || pieceAtNewPosition.getTeamColor() != teamColor) {
+            return true;
+        }
+        return false;
     }
 
 
