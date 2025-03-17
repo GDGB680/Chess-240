@@ -8,18 +8,12 @@ public abstract class PieceMovesCalculator {
     protected ChessGame.TeamColor teamColor;
     public abstract Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position);
     protected boolean isValidPosition(int row, int col) {
-        if (row >= 1 && row <= 8 && col >= 1 && col <= 8) {
-            return true;
-        }
-        return false;
+        return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }
 
     protected boolean isEmptyOrCapturablePosition(ChessBoard board, ChessPosition newPosition) {
         ChessPiece pieceAtNewPosition = board.getPiece(newPosition);
-        if (pieceAtNewPosition == null || pieceAtNewPosition.getTeamColor() != teamColor) {
-            return true;
-        }
-        return false;
+        return pieceAtNewPosition == null || pieceAtNewPosition.getTeamColor() != teamColor;
     }
 
 
@@ -48,12 +42,14 @@ public abstract class PieceMovesCalculator {
             row += rowDelta;
             col += colDelta;
             ChessPosition newPosition = new ChessPosition(row, col);
-            if (!isValidPosition(row, col)) break;
+            if (!isValidPosition(row, col)) { break; }
             if (isEmptyOrCapturablePosition(board, newPosition)) {
                 moves.add(new ChessMove(start, newPosition, null));
-                if (board.getPiece(newPosition) != null) break; // Stop if we captured a piece
-            } else {
-                break; // Stop if we hit our own piece
+                if (board.getPiece(newPosition) != null) {
+                    break;
+                } else {
+                    break;
+                }
             }
         }
     }
