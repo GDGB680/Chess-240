@@ -45,11 +45,9 @@ public abstract class PieceMovesCalculator {
             if (!isValidPosition(row, col)) { break; }
             if (isEmptyOrCapturablePosition(board, newPosition)) {
                 moves.add(new ChessMove(start, newPosition, null));
-                if (board.getPiece(newPosition) != null) {
-                    break;
-                } else {
-                    break;
-                }
+                if (board.getPiece(newPosition) != null) { break; }// Stop if we captured a piece
+            } else {
+                break; // Stop if we hit our own piece
             }
         }
     }
