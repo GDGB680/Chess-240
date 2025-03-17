@@ -1,7 +1,7 @@
 package service;
 
 import chess.*;
-import dataAccess.*;
+import dataaccess.*;
 import model.*;
 import java.util.Collection;
 import java.util.Random;

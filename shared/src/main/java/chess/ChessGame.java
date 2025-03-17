@@ -181,31 +181,6 @@ public class ChessGame {
     }
 
 
-//    private boolean goodTeam(ChessPiece piece, TeamColor teamColor, ChessPosition position) {
-//        if (piece != null && piece.getTeamColor() == teamColor) {
-//            Collection<ChessMove> moves = piece.pieceMoves(board, position);
-//            for (ChessMove move : moves) {
-//                if (isValidMove(move)) {
-//                    return true;
-//                }
-//            }
-//        }
-//        return false;
-//    }
-
-    private boolean evilTeam(ChessPiece piece, ChessPosition startPosition,
-                             TeamColor attackingTeam, ChessPosition position) {
-        if (piece != null && piece.getTeamColor() == attackingTeam) {
-            Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
-            for (ChessMove move : moves) {
-                if (move.getEndPosition().equals(position)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
 
 
 

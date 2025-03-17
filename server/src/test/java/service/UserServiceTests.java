@@ -1,7 +1,6 @@
 package service;
 
-import dataAccess.*;
-import model.*;
+import dataaccess.*;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 

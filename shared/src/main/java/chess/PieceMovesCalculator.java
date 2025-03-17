@@ -15,13 +15,7 @@ public abstract class PieceMovesCalculator {
         ChessPiece pieceAtNewPosition = board.getPiece(newPosition);
         return pieceAtNewPosition == null || pieceAtNewPosition.getTeamColor() != teamColor;
     }
-
-    protected void addMoveIfValid(Collection<ChessMove> moves, ChessBoard board, ChessPosition start, ChessPosition end) {
-        if (isValidPosition(end.getRow(), end.getColumn()) &&
-                isEmptyOrCapturablePosition(board, end)) {
-            moves.add(new ChessMove(start, end, null));
-        }
-    }
+    
 
     protected Collection<ChessMove> calculateStraightMoves(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new ArrayList<>();
