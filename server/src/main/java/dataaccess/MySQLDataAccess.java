@@ -1,62 +1,68 @@
 package dataaccess;
 
-import model.AuthData;
-import model.GameData;
-import model.UserData;
+import model.*;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
 public class MySQLDataAccess implements DataAccess {
 
+    public void MySqlDataAccess() throws DataAccessException {
+        configureDatabase();
+    }
 
-    @Override
     public UserData createUser(UserData user) throws DataAccessException {
         return null;
     }
 
-    @Override
     public UserData getUser(String userName) throws DataAccessException {
         return null;
     }
 
-    @Override
     public GameData createGame(GameData game) throws DataAccessException {
         return null;
     }
 
-    @Override
     public GameData getGame(int gameID) throws DataAccessException {
         return null;
     }
 
-    @Override
     public Collection<GameData> listGames() throws DataAccessException {
         return List.of();
     }
 
-    @Override
     public void updateGame(GameData game) throws DataAccessException {
 
     }
 
-    @Override
     public AuthData createAuthToken(AuthData authToken) throws DataAccessException {
         return null;
     }
 
-    @Override
     public AuthData getAuthToken(String authToken) throws DataAccessException {
         return null;
     }
 
-    @Override
     public void deleteAuthToken(String authToken) throws DataAccessException {
 
     }
 
-    @Override
     public void clear() throws DataAccessException {
 
+    }
+
+
+    private void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("SELECT 1+1")) {
+                var rs = preparedStatement.executeQuery();
+                rs.next();
+                System.out.println(rs.getInt(1));
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
+        }
     }
 }

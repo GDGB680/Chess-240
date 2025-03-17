@@ -18,7 +18,7 @@ public class MemoryDataAccess implements DataAccess {
     }
     public AuthData createAuthToken(AuthData authToken) {
         authToken = new AuthData(authToken.authToken, authToken.username);
-        authTokens.put(authToken.authToken, authToken);  // STORE BY TOKEN
+        authTokens.put(authToken.authToken, authToken);
         return authToken;
     }
     public GameData createGame(GameData game) {
