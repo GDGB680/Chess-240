@@ -1,6 +1,9 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import model.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -16,7 +19,7 @@ public class MySQLDataAccess implements DataAccess {
         return null;
     }
 
-    public UserData getUser(String userName) throws DataAccessException {
+    public AuthData createAuthToken(AuthData authToken) throws DataAccessException {
         return null;
     }
 
@@ -24,7 +27,16 @@ public class MySQLDataAccess implements DataAccess {
         return null;
     }
 
+
+    public UserData getUser(String userName) throws DataAccessException {
+        return null;
+    }
+
     public GameData getGame(int gameID) throws DataAccessException {
+        return null;
+    }
+
+    public AuthData getAuthToken(String authToken) throws DataAccessException {
         return null;
     }
 
@@ -36,13 +48,6 @@ public class MySQLDataAccess implements DataAccess {
 
     }
 
-    public AuthData createAuthToken(AuthData authToken) throws DataAccessException {
-        return null;
-    }
-
-    public AuthData getAuthToken(String authToken) throws DataAccessException {
-        return null;
-    }
 
     public void deleteAuthToken(String authToken) throws DataAccessException {
 

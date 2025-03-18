@@ -8,9 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Server {
-    private final MemoryDataAccess dataAccess = new MemoryDataAccess();
+//    private final MemoryDataAccess dataAccess = new MemoryDataAccess();
+    private final MySQLDataAccess dataAccess = new MySQLDataAccess();
     private final UserService userService = new UserService(dataAccess);
     private final GameService gameService = new GameService(dataAccess);
+
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
