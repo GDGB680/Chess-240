@@ -4,94 +4,103 @@ import spark.Spark;
 import dataaccess.*;
 import service.*;
 import com.google.gson.Gson;
-import java.util.HashMap;
 import java.util.Map;
 
 public class Server {
-//    private final MemoryDataAccess dataAccess = new MemoryDataAccess();
-    private final MySQLDataAccess dataAccess = new MySQLDataAccess();
-    private final UserService userService = new UserService(dataAccess);
-    private final GameService gameService = new GameService(dataAccess);
+    private final DataAccess dataAccess;
+    private final UserService userService;
+    private final GameService gameService;
+    private final Gson gson = new Gson();
 
+    public Server() throws DataAccessException {
+        try {
+//            dataAccess = new MemoryDataAccess();
+            dataAccess = new MySQLDataAccess();
+            userService = new UserService(dataAccess);
+            gameService = new GameService(dataAccess);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Failed to initialize database: " + e.getMessage());
+        }
+    }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
-        Gson gson = new Gson();
 
-        //Clear application
+        configureClearEndpoint();
+        configureRegisterEndpoint();
+        configureLoginEndpoint();
+        configureLogoutEndpoint();
+        configureListGamesEndpoint();
+        configureCreateGameEndpoint();
+        configureJoinGameEndpoint();
+
+        Spark.awaitInitialization();
+        return Spark.port();
+    }
+
+    private void configureClearEndpoint() {
         Spark.delete("/db", (req, res) -> {
             try {
                 dataAccess.clear();
                 res.status(200);
-                return gson.toJson(new HashMap<>());
+                return gson.toJson(Map.of());
             } catch (Exception e) {
                 res.status(500);
-                Map<String, String> errorResponse = new HashMap<>();
-                errorResponse.put("message", "Error: " + e.getMessage());
-                return gson.toJson(errorResponse);
+                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
+    }
 
-        // Register
+    private void configureRegisterEndpoint() {
         Spark.post("/user", (req, res) -> {
             try {
-                String body = req.body();
-                if (body == null || body.isEmpty()) {
-                    res.status(400);
-                    return gson.toJson(Map.of("message", "Error: empty request body"));
-                }
-                RegisterRequest registerRequest = gson.fromJson(body, RegisterRequest.class);
-                if (registerRequest == null || registerRequest.username()
-                        == null || registerRequest.password() == null ||
-                        registerRequest.email() == null) {
-                    res.status(400);
-                    return gson.toJson(Map.of("message", "Error: missing required fields"));
-                }
-                RegisterResult result = userService.register(registerRequest);
+                validateRequestBody(req);
+                RegisterRequest request = gson.fromJson(req.body(), RegisterRequest.class);
+                validateRegistrationFields(request);
+
+                RegisterResult result = userService.register(request);
                 res.status(200);
                 return gson.toJson(result);
             } catch (DataAccessException e) {
-                res.status(determineStatusCode(e.getMessage()));
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+                return handleException(res, e);
             } catch (Exception e) {
-                res.status(500);
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+                return handleGenericError(res, e);
             }
         });
+    }
 
-        //Login
+    private void configureLoginEndpoint() {
         Spark.post("/session", (req, res) -> {
             try {
-                LoginRequest loginRequest = gson.fromJson(req.body(), LoginRequest.class);
-                LoginResult loginResult = userService.login(loginRequest);
+                LoginRequest request = gson.fromJson(req.body(), LoginRequest.class);
+                LoginResult result = userService.login(request);
                 res.status(200);
-                return gson.toJson(loginResult);
+                return gson.toJson(result);
+            } catch (DataAccessException e) {
+                return handleException(res, e);
             } catch (Exception e) {
-                res.status(determineStatusCode(e.getMessage()));
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+                return handleGenericError(res, e);
             }
         });
+    }
 
-        //Logout
-        Spark.delete("/session", (req, res)->{
+    private void configureLogoutEndpoint() {
+        Spark.delete("/session", (req, res) -> {
             try {
                 String authToken = req.headers("authorization");
-                LogoutRequest logoutRequest = new LogoutRequest(authToken);
-                userService.logout(logoutRequest);
+                userService.logout(new LogoutRequest(authToken));
                 res.status(200);
-                return gson.toJson(new HashMap<>());
+                return gson.toJson(Map.of());
             } catch (DataAccessException e) {
-                if (e.getMessage().equals("unauthorized")) {
-                    res.status(401);
-                } else {
-                    res.status(500);
-                }
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+                return handleException(res, e);
+            } catch (Exception e) {
+                return handleGenericError(res, e);
             }
         });
+    }
 
-        //List Games
+    private void configureListGamesEndpoint() {
         Spark.get("/game", (req, res) -> {
             try {
                 String authToken = req.headers("authorization");
@@ -99,67 +108,79 @@ public class Server {
                 res.status(200);
                 return gson.toJson(result);
             } catch (DataAccessException e) {
-                res.status(determineStatusCode(e.getMessage()));
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+                return handleException(res, e);
             } catch (Exception e) {
-                res.status(500);
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+                return handleGenericError(res, e);
             }
         });
+    }
 
-        //Create Game
+    private void configureCreateGameEndpoint() {
         Spark.post("/game", (req, res) -> {
             try {
                 String authToken = req.headers("Authorization");
-                NewGameRequest createRequest = gson.fromJson(req.body(), NewGameRequest.class);
-                var result = gameService.createGame(createRequest, authToken);
+                NewGameRequest request = gson.fromJson(req.body(), NewGameRequest.class);
+                var result = gameService.createGame(request, authToken);
                 res.status(200);
                 return gson.toJson(result);
             } catch (DataAccessException e) {
-                res.status(determineStatusCode(e.getMessage()));
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+                return handleException(res, e);
             } catch (Exception e) {
-                res.status(500);
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+                return handleGenericError(res, e);
             }
         });
+    }
 
-        //Join Game
+    private void configureJoinGameEndpoint() {
         Spark.put("/game", (req, res) -> {
             try {
                 String authToken = req.headers("Authorization");
-                JoinGameRequest joinRequest = gson.fromJson(req.body(), JoinGameRequest.class);
-                gameService.joinGame(joinRequest, authToken);
+                JoinGameRequest request = gson.fromJson(req.body(), JoinGameRequest.class);
+                gameService.joinGame(request, authToken);
                 res.status(200);
                 return "{}";
             } catch (DataAccessException e) {
-                res.status(determineStatusCode(e.getMessage()));
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+                return handleException(res, e);
             } catch (Exception e) {
-                res.status(500);
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+                return handleGenericError(res, e);
             }
         });
+    }
 
-        Spark.awaitInitialization();
-        return Spark.port();
+    private void validateRequestBody(spark.Request req) throws DataAccessException {
+        if (req.body() == null || req.body().isEmpty()) {
+            throw new DataAccessException("bad request");
+        }
+    }
+
+    private void validateRegistrationFields(RegisterRequest request) throws DataAccessException {
+        if (request == null || request.username() == null ||
+                request.password() == null || request.email() == null) {
+            throw new DataAccessException("bad request");
+        }
+    }
+
+    private Object handleException(spark.Response res, DataAccessException e) {
+        res.status(determineStatusCode(e.getMessage()));
+        return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+    }
+
+    private Object handleGenericError(spark.Response res, Exception e) {
+        res.status(500);
+        return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+    }
+
+    private int determineStatusCode(String errorMessage) {
+        return switch (errorMessage) {
+            case "bad request" -> 400;
+            case "unauthorized" -> 401;
+            case "already taken" -> 403;
+            default -> 500;
+        };
     }
 
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
-    }
-
-    private int determineStatusCode(String errorMessage) {
-        switch (errorMessage) {
-            case "bad request":
-                return 400;
-            case "unauthorized":
-                return 401;
-            case "already taken":
-                return 403;
-            default:
-                return 500;
-        }
     }
 }
