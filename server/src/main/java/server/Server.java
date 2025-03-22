@@ -4,6 +4,8 @@ import spark.Spark;
 import dataaccess.*;
 import service.*;
 import com.google.gson.Gson;
+
+import java.sql.*;
 import java.util.Map;
 
 public class Server {
@@ -14,6 +16,7 @@ public class Server {
 
     public Server() {
         try {
+            validateDatabaseConnection();
             dataAccess = createDataAccess();
 //            dataAccess = new MemoryDataAccess();
             userService = new UserService(dataAccess);
@@ -181,6 +184,16 @@ public class Server {
             case "already taken" -> 403;
             default -> 500;
         };
+    }
+
+    private void validateDatabaseConnection() throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            if (!conn.isValid(2)) {
+                throw new DataAccessException("Database connection invalid");
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Connection validation failed: " + e.getMessage());
+        }
     }
 
     public void stop() {

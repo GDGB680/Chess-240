@@ -237,18 +237,24 @@ public class MySQLDataAccess implements DataAccess {
     @Override
     public void updateGame(GameData game) throws DataAccessException {
         String sql = "UPDATE games SET white_username = ?, black_username = ?, game_state = ? WHERE game_id = ?";
-        try (var conn = DatabaseManager.getConnection();
-             var stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, game.getWhiteUsername());
-            stmt.setString(2, game.getBlackUsername());
-            stmt.setString(3, gson.toJson(game.getGame()));
-            stmt.setInt(4, game.getGameID());
-            stmt.executeUpdate();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, game.getWhiteUsername());
+                stmt.setString(2, game.getBlackUsername());
+                stmt.setString(3, gson.toJson(game.getGame()));
+                stmt.setInt(4, game.getGameID());
+                stmt.executeUpdate();
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
         } catch (SQLException e) {
             throw new DataAccessException("Error updating game: " + e.getMessage());
         }
     }
+
 
     // Clear Operation
     @Override
