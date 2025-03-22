@@ -12,15 +12,19 @@ public class Server {
     private final GameService gameService;
     private final Gson gson = new Gson();
 
-    public Server() throws DataAccessException {
+    public Server() {
         try {
+            dataAccess = createDataAccess();
 //            dataAccess = new MemoryDataAccess();
-            dataAccess = new MySQLDataAccess();
             userService = new UserService(dataAccess);
             gameService = new GameService(dataAccess);
         } catch (DataAccessException e) {
-            throw new DataAccessException("Failed to initialize database: " + e.getMessage());
+            throw new RuntimeException("Failed to initialize database access", e);
         }
+    }
+
+    private DataAccess createDataAccess() throws DataAccessException {
+        return new MySQLDataAccess();
     }
 
     public int run(int desiredPort) {

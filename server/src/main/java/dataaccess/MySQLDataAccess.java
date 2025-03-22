@@ -18,33 +18,32 @@ public class MySQLDataAccess implements DataAccess {
 
     // Database Configuration
     private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
         String[] createStatements = {
                 """
-            CREATE TABLE IF NOT EXISTS users (
-                username VARCHAR(255) PRIMARY KEY,
-                password VARCHAR(255) NOT NULL,
-                email VARCHAR(255) NOT NULL
-            )
-            """,
+        CREATE TABLE IF NOT EXISTS users (
+            username VARCHAR(255) PRIMARY KEY,
+            password VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL UNIQUE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        """,
                 """
-            CREATE TABLE IF NOT EXISTS auth_tokens (
-                auth_token VARCHAR(255) PRIMARY KEY,
-                username VARCHAR(255) NOT NULL,
-                FOREIGN KEY (username) REFERENCES users(username)
-            )
-            """,
+        CREATE TABLE IF NOT EXISTS auth_tokens (
+            auth_token VARCHAR(255) PRIMARY KEY,
+            username VARCHAR(255) NOT NULL,
+            FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
+        )
+        """,
                 """
-            CREATE TABLE IF NOT EXISTS games (
-                game_id INT AUTO_INCREMENT PRIMARY KEY,
-                white_username VARCHAR(255),
-                black_username VARCHAR(255),
-                game_name VARCHAR(255) NOT NULL,
-                game_state TEXT NOT NULL,
-                FOREIGN KEY (white_username) REFERENCES users(username),
-                FOREIGN KEY (black_username) REFERENCES users(username)
-            )
-            """
+        CREATE TABLE IF NOT EXISTS games (
+            game_id INT AUTO_INCREMENT PRIMARY KEY,
+            white_username VARCHAR(255),
+            black_username VARCHAR(255),
+            game_name VARCHAR(255) NOT NULL,
+            game_state TEXT NOT NULL,
+            FOREIGN KEY (white_username) REFERENCES users(username) ON DELETE SET NULL,
+            FOREIGN KEY (black_username) REFERENCES users(username) ON DELETE SET NULL
+        )
+        """
         };
 
         try (var conn = DatabaseManager.getConnection()) {
@@ -66,13 +65,22 @@ public class MySQLDataAccess implements DataAccess {
         String sql = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
+            conn.setAutoCommit(false);
 
+            if (getUser(user.getUsername()) != null) {
+                throw new DataAccessException("already taken");
+            }
             stmt.setString(1, user.getUsername());
             stmt.setString(2, hashedPassword);
             stmt.setString(3, user.getEmail());
             stmt.executeUpdate();
+            conn.commit();
             return new UserData(user.getUsername(), hashedPassword, user.getEmail());
         } catch (SQLException e) {
+//            conn.rollback();
+            if (e.getErrorCode() == 1062) { // MySQL duplicate entry code
+                throw new DataAccessException("already taken");
+            }
             throw new DataAccessException("Error creating user: " + e.getMessage());
         }
     }
@@ -156,8 +164,8 @@ public class MySQLDataAccess implements DataAccess {
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            stmt.setString(1, game.getWhiteUsername());
-            stmt.setString(2, game.getBlackUsername());
+            stmt.setString(1, game.getWhiteUsername() == null ? null : game.getWhiteUsername());
+            stmt.setString(2, game.getBlackUsername() == null ? null : game.getBlackUsername());
             stmt.setString(3, game.getGameName());
             stmt.setString(4, gson.toJson(game.getGame()));
             stmt.executeUpdate();
