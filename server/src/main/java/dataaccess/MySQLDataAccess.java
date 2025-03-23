@@ -261,13 +261,16 @@ public class MySQLDataAccess implements DataAccess {
     public void clear() throws DataAccessException {
         String[] tables = {"auth_tokens", "games", "users"};
         try (var conn = DatabaseManager.getConnection()) {
-            for (var table : tables) {
-                try (var stmt = conn.prepareStatement("TRUNCATE TABLE " + table)) {
-                    stmt.executeUpdate();
+            try (Statement stmt = conn.createStatement()) {
+                stmt.executeUpdate("SET FOREIGN_KEY_CHECKS = 0");
+                for (var table : tables) {
+                    stmt.executeUpdate("TRUNCATE TABLE " + table);
                 }
+                stmt.executeUpdate("SET FOREIGN_KEY_CHECKS = 1");
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error clearing database: " + e.getMessage());
         }
     }
+
 }
