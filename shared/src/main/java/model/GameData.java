@@ -19,25 +19,11 @@ public class GameData {
         this.game = game;
     }
 
-    public int getGameID() {
-        return gameID;
-    }
-
-    public String getWhiteUsername() {
-        return whiteUsername;
-    }
-
-    public String getBlackUsername() {
-        return blackUsername;
-    }
-
-    public String getGameName() {
-        return gameName;
-    }
-
-    public ChessGame getGame() {
-        return game;
-    }
+    public int getGameID() {return gameID;}
+    public String getWhiteUsername() {return whiteUsername;}
+    public String getBlackUsername() {return blackUsername;}
+    public String getGameName() {return gameName;}
+    public ChessGame getGame() {return game;}
 
     @Override
     public boolean equals(Object o) {

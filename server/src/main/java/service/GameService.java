@@ -61,13 +61,18 @@ public class GameService {
 
         String username = authData.getUsername();
         GameData updatedGameData;
+
         if (request.playerColor().equals("WHITE")) {
-            updatedGameData = new GameData(gameData.getGameID(), username,
-                    gameData.getBlackUsername(), gameData.getGameName(),
+            updatedGameData = new GameData(gameData.getGameID(),
+                    gameData.getWhiteUsername(),
+                    username,
+                    gameData.getGameName(),
                     gameData.getGame());
         } else {
             updatedGameData = new GameData(gameData.getGameID(),
-                    gameData.getWhiteUsername(), username, gameData.getGameName(),
+                    gameData.getWhiteUsername(),
+                    username,
+                    gameData.getGameName(),
                     gameData.getGame());
         }
         dataAccess.updateGame(updatedGameData);

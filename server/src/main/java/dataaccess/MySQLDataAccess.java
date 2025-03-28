@@ -66,7 +66,7 @@ public class MySQLDataAccess implements DataAccess {
 
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
-//            conn.setAutoCommit(false);
+            conn.setAutoCommit(false);
 
             if (getUser(user.getUsername()) != null) {
                 throw new DataAccessException("already taken");
@@ -263,7 +263,7 @@ public class MySQLDataAccess implements DataAccess {
     public void clear() throws DataAccessException {
         String[] tables = {"authTokens", "games", "users"};
         try (var conn = DatabaseManager.getConnection()) {
-            try (Statement stmt = conn.createStatement()) {
+            try (var stmt = conn.createStatement()) {
                 stmt.executeUpdate("SET FOREIGN_KEY_CHECKS = 0");
                 for (var table : tables) {
                     stmt.executeUpdate("TRUNCATE TABLE " + table);
