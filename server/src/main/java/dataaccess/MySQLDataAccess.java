@@ -13,6 +13,7 @@ public class MySQLDataAccess implements DataAccess {
 
     private final Gson gson = new Gson();
     public MySQLDataAccess() throws DataAccessException {
+        DatabaseManager.createDatabase();
         configureDatabase();
     }
 
@@ -27,21 +28,21 @@ public class MySQLDataAccess implements DataAccess {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
         """,
                 """
-        CREATE TABLE IF NOT EXISTS auth_tokens (
-            auth_token VARCHAR(255) PRIMARY KEY,
+        CREATE TABLE IF NOT EXISTS authTokens (
+            authToken VARCHAR(255) PRIMARY KEY,
             username VARCHAR(255) NOT NULL,
             FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
         )
         """,
                 """
         CREATE TABLE IF NOT EXISTS games (
-            game_id INT AUTO_INCREMENT PRIMARY KEY,
-            white_username VARCHAR(255),
-            black_username VARCHAR(255),
-            game_name VARCHAR(255) NOT NULL,
-            game_state TEXT NOT NULL,
-            FOREIGN KEY (white_username) REFERENCES users(username) ON DELETE SET NULL,
-            FOREIGN KEY (black_username) REFERENCES users(username) ON DELETE SET NULL
+            gameID INT AUTO_INCREMENT PRIMARY KEY,
+            whiteUsername VARCHAR(255),
+            blackUsername VARCHAR(255),
+            gameName VARCHAR(255) NOT NULL,
+            game TEXT NOT NULL,
+            FOREIGN KEY (whiteUsername) REFERENCES users(username) ON DELETE SET NULL,
+            FOREIGN KEY (blackUsername) REFERENCES users(username) ON DELETE SET NULL
         )
         """
         };
@@ -66,7 +67,7 @@ public class MySQLDataAccess implements DataAccess {
 
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
-            conn.setAutoCommit(false);
+//            conn.setAutoCommit(false);
 
             if (getUser(user.getUsername()) != null) {
                 throw new DataAccessException("already taken");
@@ -112,7 +113,7 @@ public class MySQLDataAccess implements DataAccess {
     // Auth Operations
     @Override
     public AuthData createAuthToken(AuthData authToken) throws DataAccessException {
-        String sql = "INSERT INTO auth_tokens (auth_token, username) VALUES (?, ?)";
+        String sql = "INSERT INTO authTokens (authToken, username) VALUES (?, ?)";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
 
@@ -127,7 +128,7 @@ public class MySQLDataAccess implements DataAccess {
 
     @Override
     public AuthData getAuthToken(String authToken) throws DataAccessException {
-        String sql = "SELECT * FROM auth_tokens WHERE auth_token = ?";
+        String sql = "SELECT * FROM authTokens WHERE authToken = ?";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
 
@@ -135,34 +136,34 @@ public class MySQLDataAccess implements DataAccess {
             try (var rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return new AuthData(
-                            rs.getString("auth_token"),
+                            rs.getString("authToken"),
                             rs.getString("username")
                     );
                 }
                 return null;
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error getting auth token: " + e.getMessage());
+            throw new DataAccessException("Error getting authToken: " + e.getMessage());
         }
     }
 
     @Override
     public void deleteAuthToken(String authToken) throws DataAccessException {
-        String sql = "DELETE FROM auth_tokens WHERE auth_token = ?";
+        String sql = "DELETE FROM authTokens WHERE authToken = ?";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, authToken);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new DataAccessException("Error deleting auth token: " + e.getMessage());
+            throw new DataAccessException("Error deleting authToken: " + e.getMessage());
         }
     }
 
     // Game Operations
     @Override
     public GameData createGame(GameData game) throws DataAccessException {
-        String sql = "INSERT INTO games (white_username, black_username, game_name, game_state) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -191,7 +192,7 @@ public class MySQLDataAccess implements DataAccess {
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
-        String sql = "SELECT * FROM games WHERE game_id = ?";
+        String sql = "SELECT * FROM games WHERE gameID = ?";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
 
@@ -199,11 +200,11 @@ public class MySQLDataAccess implements DataAccess {
             try (var rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return new GameData(
-                            rs.getInt("game_id"),
-                            rs.getString("white_username"),
-                            rs.getString("black_username"),
-                            rs.getString("game_name"),
-                            gson.fromJson(rs.getString("game_state"), ChessGame.class)
+                            rs.getInt("gameID"),
+                            rs.getString("whiteUsername"),
+                            rs.getString("blackUsername"),
+                            rs.getString("gameName"),
+                            gson.fromJson(rs.getString("game"), ChessGame.class)
                     );
                 }
                 return null;
@@ -223,11 +224,11 @@ public class MySQLDataAccess implements DataAccess {
 
             while (rs.next()) {
                 games.add(new GameData(
-                        rs.getInt("game_id"),
-                        rs.getString("white_username"),
-                        rs.getString("black_username"),
-                        rs.getString("game_name"),
-                        gson.fromJson(rs.getString("game_state"), ChessGame.class)
+                        rs.getInt("gameID"),
+                        rs.getString("whiteUsername"),
+                        rs.getString("blackUsername"),
+                        rs.getString("gameName"),
+                        gson.fromJson(rs.getString("game"), ChessGame.class)
                 ));
             }
             return games;
@@ -238,7 +239,7 @@ public class MySQLDataAccess implements DataAccess {
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
-        String sql = "UPDATE games SET white_username = ?, black_username = ?, game_state = ? WHERE game_id = ?";
+        String sql = "UPDATE games SET whiteUsername = ?, blackUsername = ?, game = ? WHERE gameID = ?";
         try (Connection conn = DatabaseManager.getConnection()) {
             conn.setAutoCommit(false);
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -261,7 +262,7 @@ public class MySQLDataAccess implements DataAccess {
     // Clear Operation
     @Override
     public void clear() throws DataAccessException {
-        String[] tables = {"auth_tokens", "games", "users"};
+        String[] tables = {"authTokens", "games", "users"};
         try (var conn = DatabaseManager.getConnection()) {
             try (Statement stmt = conn.createStatement()) {
                 stmt.executeUpdate("SET FOREIGN_KEY_CHECKS = 0");
