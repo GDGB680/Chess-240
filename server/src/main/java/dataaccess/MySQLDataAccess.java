@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class MySQLDataAccess implements DataAccess {
-    private final Gson gson = new Gson();
 
+    private final Gson gson = new Gson();
     public MySQLDataAccess() throws DataAccessException {
         configureDatabase();
     }
@@ -63,6 +63,7 @@ public class MySQLDataAccess implements DataAccess {
         String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
 
         String sql = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
+
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             conn.setAutoCommit(false);
@@ -70,6 +71,7 @@ public class MySQLDataAccess implements DataAccess {
             if (getUser(user.getUsername()) != null) {
                 throw new DataAccessException("already taken");
             }
+
             stmt.setString(1, user.getUsername());
             stmt.setString(2, hashedPassword);
             stmt.setString(3, user.getEmail());
