@@ -15,6 +15,9 @@ public class ChessPiece {
         this.movesCalculator = createMovesCalculator(type);
     }
 
+    // Anonymous subclass to handle concrete instantiation
+//    public abstract ChessPiece copy();
+
     public enum PieceType {
         KING,
         QUEEN,

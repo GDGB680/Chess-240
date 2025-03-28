@@ -1,20 +1,46 @@
 package dataaccess;
 
 import chess.ChessGame;
-import com.google.gson.Gson;
+import chess.ChessPiece;
+import com.google.gson.*;
 import model.*;
 import org.mindrot.jbcrypt.BCrypt;
+
+import java.lang.reflect.Type;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class MySQLDataAccess implements DataAccess {
 
-    private final Gson gson = new Gson();
+    private final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(ChessPiece.class, new JsonDeserializer<ChessPiece>() {
+                @Override
+                public ChessPiece deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                    JsonObject jsonObject = json.getAsJsonObject();
+                    ChessGame.TeamColor teamColor = context.deserialize(jsonObject.get("teamColor"), ChessGame.TeamColor.class);
+                    ChessPiece.PieceType pieceType = context.deserialize(jsonObject.get("pieceType"), ChessPiece.PieceType.class);
+                    return new ChessPiece(teamColor, pieceType) {
+//                        @Override
+//                        public ChessPiece copy() {
+//                            return this;
+//                        }
+                    };
+                }
+            })
+            .create();
+
     public MySQLDataAccess() throws DataAccessException {
         DatabaseManager.createDatabase();
         configureDatabase();
+//        this.gson = createGsonWithAdapters();
     }
+
+//    private Gson createGsonWithAdapters() {
+//        GsonBuilder gsonBuilder = new GsonBuilder();
+//        gsonBuilder.registerTypeAdapter(ChessPiece.class, new ChessPieceAdapter());
+//        return gsonBuilder.create();
+//    }
 
     // Database Configuration
     private void configureDatabase() throws DataAccessException {
@@ -165,9 +191,8 @@ public class MySQLDataAccess implements DataAccess {
         String sql = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            stmt.setString(1, game.getWhiteUsername() == null ? null : game.getWhiteUsername());
-            stmt.setString(2, game.getBlackUsername() == null ? null : game.getBlackUsername());
+            stmt.setString(1, game.getWhiteUsername());
+            stmt.setString(2, game.getBlackUsername());
             stmt.setString(3, game.getGameName());
             stmt.setString(4, gson.toJson(game.getGame()));
             stmt.executeUpdate();
@@ -194,7 +219,6 @@ public class MySQLDataAccess implements DataAccess {
         String sql = "SELECT * FROM games WHERE gameID = ?";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql)) {
-
             stmt.setInt(1, gameID);
             try (var rs = stmt.executeQuery()) {
                 if (rs.next()) {
