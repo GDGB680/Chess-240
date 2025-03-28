@@ -4,7 +4,6 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import model.*;
 import org.mindrot.jbcrypt.BCrypt;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
