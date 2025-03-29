@@ -18,4 +18,9 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
         moves.addAll(calculateDiagonalMoves(board, position));
         return moves;
     }
+
+
+//    public Type = Bishop;
 }
+
+

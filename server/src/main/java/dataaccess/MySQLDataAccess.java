@@ -2,6 +2,9 @@ package dataaccess;
 
 import chess.ChessGame;
 import chess.ChessPiece;
+//import chess.
+import chess.PieceMovesCalculator;
+import chess.PieceMovesCalculatorAdapter;
 import com.google.gson.*;
 import model.*;
 import org.mindrot.jbcrypt.BCrypt;
@@ -13,34 +16,14 @@ import java.util.Collection;
 
 public class MySQLDataAccess implements DataAccess {
 
-    private final Gson gson = new GsonBuilder()
-            .registerTypeAdapter(ChessPiece.class, new JsonDeserializer<ChessPiece>() {
-                @Override
-                public ChessPiece deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-                    JsonObject jsonObject = json.getAsJsonObject();
-                    ChessGame.TeamColor teamColor = context.deserialize(jsonObject.get("teamColor"), ChessGame.TeamColor.class);
-                    ChessPiece.PieceType pieceType = context.deserialize(jsonObject.get("pieceType"), ChessPiece.PieceType.class);
-                    return new ChessPiece(teamColor, pieceType) {
-//                        @Override
-//                        public ChessPiece copy() {
-//                            return this;
-//                        }
-                    };
-                }
-            })
-            .create();
+    private final Gson gson = new Gson();
 
     public MySQLDataAccess() throws DataAccessException {
         DatabaseManager.createDatabase();
         configureDatabase();
-//        this.gson = createGsonWithAdapters();
     }
 
-//    private Gson createGsonWithAdapters() {
-//        GsonBuilder gsonBuilder = new GsonBuilder();
-//        gsonBuilder.registerTypeAdapter(ChessPiece.class, new ChessPieceAdapter());
-//        return gsonBuilder.create();
-//    }
+
 
     // Database Configuration
     private void configureDatabase() throws DataAccessException {
@@ -245,13 +228,16 @@ public class MySQLDataAccess implements DataAccess {
              var stmt = conn.prepareStatement(sql);
              var rs = stmt.executeQuery()) {
 
+            var builder = new GsonBuilder();
+            builder.registerTypeAdapter(PieceMovesCalculator.class, new PieceMovesCalculatorAdapter());
+
             while (rs.next()) {
                 games.add(new GameData(
                         rs.getInt("gameID"),
                         rs.getString("whiteUsername"),
                         rs.getString("blackUsername"),
                         rs.getString("gameName"),
-                        gson.fromJson(rs.getString("game"), ChessGame.class)
+                        builder.create().fromJson(rs.getString("game"), ChessGame.class)
                 ));
             }
             return games;

@@ -1,5 +1,6 @@
 package chess;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -7,6 +8,16 @@ public abstract class PieceMovesCalculator {
 
     protected ChessGame.TeamColor teamColor;
     public abstract Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position);
+
+//    public enum Type {
+//        KING,
+//        QUEEN,
+//        BISHOP,
+//        KNIGHT,
+//        ROOK,
+//        PAWN
+//    }
+
     protected boolean isValidPosition(int row, int col) {
         return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }
@@ -47,8 +58,10 @@ public abstract class PieceMovesCalculator {
                 moves.add(new ChessMove(start, newPosition, null));
                 if (board.getPiece(newPosition) != null) { break; }// Stop if we captured a piece
             } else {
-                break; // Stop if we hit our own piece
+                break;
             }
         }
     }
 }
+
+
