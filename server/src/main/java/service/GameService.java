@@ -23,9 +23,9 @@ public class GameService {
         }
         int gameID = generateGameID();
         ChessGame newGame = new ChessGame();
-        GameData newGameData = new GameData(gameID, null, null, request.gameName(), newGame);
-        dataAccess.createGame(newGameData);
-        return new NewGameResult(gameID);
+//        GameData newGameData = new GameData(0, null, null, request.gameName(), newGame);
+        GameData newGameData = dataAccess.createGame(authData.username, null, request.gameName(), newGame);
+        return new NewGameResult(newGameData.gameID);
     }
 
     public ListGamesResult listGames(String authToken) throws DataAccessException {

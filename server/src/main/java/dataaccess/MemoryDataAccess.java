@@ -1,9 +1,11 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.*;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Random;
 
 public class MemoryDataAccess implements DataAccess {
 
@@ -21,10 +23,10 @@ public class MemoryDataAccess implements DataAccess {
         authTokens.put(authToken.authToken, authToken);
         return authToken;
     }
-    public GameData createGame(GameData game) {
-        game = new GameData(game.gameID, game.whiteUsername, game.blackUsername, game.gameName, game.game);
-        games.put(game.gameID, game);
-        return game;
+    public GameData createGame(String whiteUsername, String blackUsername, String gameName, ChessGame game) {
+        GameData newGameData = new GameData(generateGameID(),whiteUsername, blackUsername, gameName, game);
+        games.put(newGameData.gameID, newGameData);
+        return newGameData;
     }
 
     public Collection<GameData> listGames() { return games.values(); }
@@ -45,5 +47,9 @@ public class MemoryDataAccess implements DataAccess {
         users.clear();
         authTokens.clear();
         games.clear();
+    }
+    private int generateGameID() {
+        Random random = new Random();
+        return random.nextInt(1000);
     }
 }

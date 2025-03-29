@@ -1,10 +1,7 @@
 package dataaccess;
 
-import chess.ChessGame;
-import chess.ChessPiece;
+import chess.*;
 //import chess.
-import chess.PieceMovesCalculator;
-import chess.PieceMovesCalculatorAdapter;
 import com.google.gson.*;
 import model.*;
 import org.mindrot.jbcrypt.BCrypt;
@@ -170,24 +167,24 @@ public class MySQLDataAccess implements DataAccess {
 
     // Game Operations
     @Override
-    public GameData createGame(GameData game) throws DataAccessException {
+    public GameData createGame(String whiteUsername, String blackUsername, String gameName, ChessGame game) throws DataAccessException {
         String sql = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, game.getWhiteUsername());
-            stmt.setString(2, game.getBlackUsername());
-            stmt.setString(3, game.getGameName());
-            stmt.setString(4, gson.toJson(game.getGame()));
+            stmt.setString(1, whiteUsername);
+            stmt.setString(2, blackUsername);
+            stmt.setString(3, gameName);
+            stmt.setString(4, gson.toJson(game));
             stmt.executeUpdate();
 
             try (var rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) {
                     return new GameData(
                             rs.getInt(1),
-                            game.getWhiteUsername(),
-                            game.getBlackUsername(),
-                            game.getGameName(),
-                            game.getGame()
+                            whiteUsername,
+                            blackUsername,
+                            gameName,
+                            game
                     );
                 }
                 throw new DataAccessException("Failed to create game");
@@ -229,8 +226,9 @@ public class MySQLDataAccess implements DataAccess {
              var rs = stmt.executeQuery()) {
 
             var builder = new GsonBuilder();
-            builder.registerTypeAdapter(PieceMovesCalculator.class, new PieceMovesCalculatorAdapter());
-
+//            builder.registerTypeAdapter(PieceMovesCalculator.class, new PieceMovesCalculatorAdapter());
+//            builder.registerTypeAdapter(ChessGame.class, new ChessGameAdapter());
+            builder.registerTypeAdapter(ChessPiece.class, new ChessPieceAdapter());
             while (rs.next()) {
                 games.add(new GameData(
                         rs.getInt("gameID"),
