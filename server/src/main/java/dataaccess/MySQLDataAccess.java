@@ -1,7 +1,6 @@
 package dataaccess;
 
 import chess.*;
-//import chess.
 import com.google.gson.*;
 import model.*;
 import org.mindrot.jbcrypt.BCrypt;
