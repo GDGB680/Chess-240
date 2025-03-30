@@ -162,7 +162,7 @@ public class MySQLDataAccessTests {
     void updateGamePositive() throws Exception {
         GameData game = new GameData(0, "whiteplayer", "blackplayer", "testgame", testGame);
 
-        GameData created = dao.createGame(null, null, null, game.game);
+        GameData created = dao.createGame(null, null, "testgame", game.game);
 
         GameData updated = new GameData(
                 created.getGameID(),
