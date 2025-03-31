@@ -5,7 +5,6 @@ import dataaccess.*;
 import service.*;
 import com.google.gson.Gson;
 
-import java.sql.*;
 import java.util.Map;
 
 public class Server {
@@ -14,26 +13,42 @@ public class Server {
     private final GameService gameService;
     private final Gson gson = new Gson();
 
+    // Default constructor using environment variable
     public Server() {
-        try {
-            validateDatabaseConnection();
-            dataAccess = createDataAccess();
-//            dataAccess = new MemoryDataAccess();
-            userService = new UserService(dataAccess);
-            gameService = new GameService(dataAccess);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Failed to initialize database access", e);
-        }
+        this(createDataAccessFromEnv());
     }
 
-    private DataAccess createDataAccess() throws DataAccessException {
-        return new MySQLDataAccess();
+    // Existing constructor for dependency injection
+    public Server(DataAccess dataAccess) {
+        this.dataAccess = dataAccess;
+        this.userService = new UserService(dataAccess);
+        this.gameService = new GameService(dataAccess);
+    }
+
+    private static DataAccess createDataAccessFromEnv() {
+        String storageType = System.getenv("CHESS_STORAGE");
+        if ("memory".equalsIgnoreCase(storageType)) {
+            return new MemoryDataAccess();
+        }
+
+        try {
+            return new MySQLDataAccess();
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Failed to initialize MySQLDataAccess", e);
+        }
     }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
 
+        configureEndpoints();
+
+        Spark.awaitInitialization();
+        return Spark.port();
+    }
+
+    private void configureEndpoints() {
         configureClearEndpoint();
         configureRegisterEndpoint();
         configureLoginEndpoint();
@@ -41,9 +56,6 @@ public class Server {
         configureListGamesEndpoint();
         configureCreateGameEndpoint();
         configureJoinGameEndpoint();
-
-        Spark.awaitInitialization();
-        return Spark.port();
     }
 
     private void configureClearEndpoint() {
@@ -65,7 +77,6 @@ public class Server {
                 validateRequestBody(req);
                 RegisterRequest request = gson.fromJson(req.body(), RegisterRequest.class);
                 validateRegistrationFields(request);
-
                 RegisterResult result = userService.register(request);
                 res.status(200);
                 return gson.toJson(result);
@@ -184,16 +195,6 @@ public class Server {
             case "already taken" -> 403;
             default -> 500;
         };
-    }
-
-    private void validateDatabaseConnection() throws DataAccessException {
-        try (Connection conn = DatabaseManager.getConnection()) {
-            if (!conn.isValid(2)) {
-                throw new DataAccessException("Database connection invalid");
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException("Connection validation failed: " + e.getMessage());
-        }
     }
 
     public void stop() {
