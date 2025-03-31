@@ -25,7 +25,8 @@ public class GameService {
         int gameID = generateGameID();
         ChessGame newGame = new ChessGame();
 //        GameData newGameData = new GameData(0, null, null, request.gameName(), newGame);
-        GameData newGameData = dataAccess.createGame(authData.username, null, request.gameName(), newGame);
+        GameData newGameData = dataAccess.createGame(authData.username, null,
+                request.gameName(), newGame);
         return new NewGameResult(newGameData.gameID);
     }
 

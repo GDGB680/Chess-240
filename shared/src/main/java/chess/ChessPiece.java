@@ -29,7 +29,9 @@ public class ChessPiece {
 
     public ChessGame.TeamColor getTeamColor() { return this.pieceColor; }
     public PieceType getPieceType() { return this.pieceType; }
-    public PieceMovesCalculator setMovesCalculator(PieceType pieceType){ return this.movesCalculator = createMovesCalculator(pieceType);}
+    public PieceMovesCalculator setMovesCalculator(PieceType pieceType){
+        return this.movesCalculator = createMovesCalculator(pieceType);
+    }
     public PieceMovesCalculator createMovesCalculator(PieceType type) {
         switch (type) {
             case KING: return new KingMovesCalculator();

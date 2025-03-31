@@ -30,6 +30,6 @@ public class ChessPieceAdapter implements JsonDeserializer<ChessPiece> {
         piece.setMovesCalculator(pieceType);
         return piece;
 
-        }
+    }
 
 }
